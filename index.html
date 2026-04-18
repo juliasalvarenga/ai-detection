@@ -270,8 +270,7 @@
             transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
             font-family: inherit;
         }
-        .choice .icon { font-size: 1.6em; line-height: 1; }
-        .choice .label { font-size: 0.98em; }
+        .choice .label { font-size: 1.05em; }
         .choice .hint {
             font-size: 0.72em;
             font-weight: 500;
@@ -286,17 +285,11 @@
             font-family: ui-monospace, monospace;
             font-size: 0.9em;
         }
-        .choice.real:hover:not(:disabled) {
-            background: rgba(16, 185, 129, 0.12);
-            border-color: rgba(16, 185, 129, 0.45);
+        .choice:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(255, 255, 255, 0.28);
             transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.18);
-        }
-        .choice.ai:hover:not(:disabled) {
-            background: rgba(139, 92, 246, 0.14);
-            border-color: rgba(139, 92, 246, 0.5);
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(139, 92, 246, 0.22);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
         }
         .choice:disabled { cursor: not-allowed; opacity: 0.5; }
 
@@ -405,13 +398,11 @@
                 <img id="currentImage" src="" alt="Face to evaluate">
             </div>
             <div class="choices">
-                <button class="choice ai" data-guess="ai" type="button">
-                    <span class="icon">🤖</span>
+                <button class="choice" data-guess="ai" type="button">
                     <span class="label">AI Generated</span>
                     <span class="hint"><kbd>A</kbd></span>
                 </button>
-                <button class="choice real" data-guess="real" type="button">
-                    <span class="icon">👤</span>
+                <button class="choice" data-guess="real" type="button">
                     <span class="label">Real</span>
                     <span class="hint"><kbd>R</kbd></span>
                 </button>
@@ -512,13 +503,21 @@
         }
 
         function startGame() {
-            order = shuffle(IMAGE_DATA.map((_, i) => i));
+            const realPool = REAL_FACES.slice();
+            const aiPool = IMAGE_DATA.map((_, i) => i).filter(i => !REAL_FACES.includes(i));
+            const sampledAI = shuffle(aiPool).slice(0, realPool.length);
+            order = shuffle([...realPool, ...sampledAI]);
             cursor = 0;
             score = 0;
             answers = [];
             locked = false;
-            el.totalImages.textContent = IMAGE_DATA.length;
+            el.totalImages.textContent = order.length;
             el.progressFill.style.width = '0%';
+
+            const choicesContainer = document.querySelector('.choices');
+            const buttons = Array.from(choicesContainer.children);
+            if (Math.random() < 0.5) choicesContainer.appendChild(buttons[0]);
+
             showScreen(el.gameScreen);
             renderCurrent(true);
         }
@@ -536,7 +535,7 @@
                 setTimeout(swap, 160);
             }
             el.currentIndex.textContent = cursor + 1;
-            el.progressFill.style.width = `${(cursor / IMAGE_DATA.length) * 100}%`;
+            el.progressFill.style.width = `${(cursor / order.length) * 100}%`;
             setChoicesDisabled(false);
         }
 
@@ -559,7 +558,7 @@
             answers.push({ index: imageIdx, guess, correct, isReal });
 
             cursor++;
-            if (cursor >= IMAGE_DATA.length) {
+            if (cursor >= order.length) {
                 el.progressFill.style.width = '100%';
                 finishGame();
             } else {
@@ -571,7 +570,7 @@
         }
 
         async function finishGame() {
-            const total = IMAGE_DATA.length;
+            const total = order.length;
             const percent = Math.round((score / total) * 100);
             el.finalScore.textContent = score;
             el.finalTotal.textContent = total;
