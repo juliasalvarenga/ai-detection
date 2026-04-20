@@ -452,6 +452,52 @@
                     <option value="65+">65+</option>
                 </select>
             </div>
+            <div class="age-field">
+                <label for="country">Country / region</label>
+                <select id="country" required>
+                    <option value="">Select</option>
+                    <option>Australia</option>
+                    <option>Brazil</option>
+                    <option>Canada</option>
+                    <option>China</option>
+                    <option>France</option>
+                    <option>Germany</option>
+                    <option>India</option>
+                    <option>Indonesia</option>
+                    <option>Italy</option>
+                    <option>Japan</option>
+                    <option>Mexico</option>
+                    <option>Netherlands</option>
+                    <option>Nigeria</option>
+                    <option>Portugal</option>
+                    <option>South Africa</option>
+                    <option>South Korea</option>
+                    <option>Spain</option>
+                    <option>Sweden</option>
+                    <option>United Kingdom</option>
+                    <option>United States</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div class="age-field">
+                <label for="aiUsage">How often do you use AI tools?</label>
+                <select id="aiUsage" required>
+                    <option value="">Select</option>
+                    <option value="Daily">Daily</option>
+                    <option value="Weekly">Weekly</option>
+                    <option value="Rarely">Rarely</option>
+                    <option value="Never">Never</option>
+                </select>
+            </div>
+            <div class="age-field">
+                <label for="profession">Profession</label>
+                <select id="profession" required>
+                    <option value="">Select</option>
+                    <option value="Tech">Tech</option>
+                    <option value="Creative">Creative</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
             <button id="startBtn" class="btn" disabled>
                 <span>Begin</span>
                 <span class="arrow">&rarr;</span>
@@ -664,6 +710,9 @@
             gameScreen: document.getElementById('gameScreen'),
             resultsScreen: document.getElementById('resultsScreen'),
             ageRange: document.getElementById('ageRange'),
+            country: document.getElementById('country'),
+            aiUsage: document.getElementById('aiUsage'),
+            profession: document.getElementById('profession'),
             startBtn: document.getElementById('startBtn'),
             currentImage: document.getElementById('currentImage'),
             currentIndex: document.getElementById('currentIndex'),
@@ -811,6 +860,9 @@
                         data: [{
                             Timestamp: new Date().toLocaleString(),
                             AgeRange: el.ageRange.value,
+                            Country: el.country.value,
+                            AIUsage: el.aiUsage.value,
+                            Profession: el.profession.value,
                             Score: `${score}/${total}`,
                             SelectedFaces: answers.filter(a => a.guess === 'real').map(a => a.index + 1).join(', ')
                         }]
@@ -821,11 +873,12 @@
             }
         }
 
-        el.ageRange.addEventListener('change', () => {
-            el.startBtn.disabled = !el.ageRange.value;
-        });
+        function checkFormReady() {
+            el.startBtn.disabled = !(el.ageRange.value && el.country.value && el.aiUsage.value && el.profession.value);
+        }
+        [el.ageRange, el.country, el.aiUsage, el.profession].forEach(s => s.addEventListener('change', checkFormReady));
         el.startBtn.addEventListener('click', () => {
-            if (el.ageRange.value) startGame();
+            if (!el.startBtn.disabled) startGame();
         });
         el.choices.forEach(btn => {
             btn.addEventListener('click', () => handleGuess(btn.dataset.guess));
