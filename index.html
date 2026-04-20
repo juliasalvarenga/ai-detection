@@ -826,11 +826,11 @@
             el.statWrong.textContent = total - score;
 
             let msg;
-            if (percent === 100) msg = '🎉 Flawless — you have an incredible eye for detail.';
-            else if (percent >= 80) msg = '🔥 Excellent! Your instincts are sharp.';
-            else if (percent >= 60) msg = '👍 Solid work — AI faces are getting tricky.';
+            if (percent === 100) msg = 'Flawless — you have an incredible eye for detail.';
+            else if (percent >= 80) msg = 'Excellent! Your instincts are sharp.';
+            else if (percent >= 60) msg = 'Solid work — AI faces are getting tricky.';
             else if (percent >= 40) msg = 'Close to a coin flip. These models are fooling everyone.';
-            else msg = '😅 Generative AI got the better of you this round.';
+            else msg = 'Generative AI got the better of you this round.';
             el.resultMessage.textContent = msg;
 
             // Populate reveal grid
